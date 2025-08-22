@@ -302,14 +302,24 @@ class ADSBoostCelery(ADSCelery):
             record_collections = ['general']
             is_default_general = True
         
+        # Map new collection names to database column names
+        collection_mapping = {
+            'astrophysics': 'astronomy',
+            'earthscience': 'earth_science', 
+            'planetary': 'planetary_science',
+            'physics': 'physics',
+            'heliophysics': 'heliophysics',
+            'general': 'general'
+        }
+        
         # Get ranking configuration from config
         collection_rankings = self.config.get('COLLECTION_RANKINGS', {})
         if not collection_rankings:
             logger.warning("No COLLECTION_RANKINGS found in config, using default weights")
-            collections = self.config.get('COLLECTIONS', ['astronomy', 'physics', 'earth_science', 'planetary_science', 'heliophysics', 'general'])
-            return {f'{collection}_weight': 1.0 for collection in collections}
+            collections = self.config.get('COLLECTIONS', ['astrophysics', 'physics', 'earthscience', 'planetary', 'heliophysics', 'general'])
+            return {f'{collection_mapping[collection]}_weight': 1.0 for collection in collections}
         
-        collections = self.config.get('COLLECTIONS', ['astronomy', 'physics', 'earth_science', 'planetary_science', 'heliophysics', 'general'])
+        collections = self.config.get('COLLECTIONS', ['astrophysics', 'physics', 'earthscience', 'planetary', 'heliophysics', 'general'])
         
         # Find all unique ranks that are actually present in the rankings
         all_ranks = set()
@@ -342,7 +352,8 @@ class ADSBoostCelery(ADSCelery):
         # Special case: if record explicitly has 'general' collection, all disciplines get weight 1.0
         if 'general' in record_collections:
             for discipline in collections:
-                collection_weights[f'{discipline}_weight'] = 1.0
+                db_collection = collection_mapping[discipline]
+                collection_weights[f'{db_collection}_weight'] = 1.0
             return collection_weights
 
         for discipline in collections:
@@ -355,7 +366,9 @@ class ADSBoostCelery(ADSCelery):
                     weight = rank_to_weight.get(rank, 0.0)
                     max_weight = max(max_weight, weight)
             
-            collection_weights[f'{discipline}_weight'] = max_weight
+            # Map the collection name to the database column name
+            db_collection = collection_mapping[discipline]
+            collection_weights[f'{db_collection}_weight'] = max_weight
         
         return collection_weights
 
@@ -404,11 +417,24 @@ class ADSBoostCelery(ADSCelery):
         collection_weights = self.compute_collection_weights(record)
         
         # Step 4: Compute all discipline final boosts as discipline_weight * boost_factor
-        collections = self.config.get('COLLECTIONS', ['astronomy', 'physics', 'earth_science', 'planetary_science', 'heliophysics', 'general'])
+        # Map new collection names to database column names
+        collection_mapping = {
+            'astrophysics': 'astronomy',
+            'earthscience': 'earth_science', 
+            'planetary': 'planetary_science',
+            'physics': 'physics',
+            'heliophysics': 'heliophysics',
+            'general': 'general'
+        }
         
+        collections = self.config.get('COLLECTIONS', ['astrophysics', 'physics', 'earthscience', \
+            'planetary', 'heliophysics', 'general'])
+            
         final_boosts = {}
         for collection in collections:
-            final_boosts[f'{collection}_final_boost'] = collection_weights[f'{collection}_weight'] * boost_factor
+            # Map the collection name to the database column name
+            db_collection = collection_mapping[collection]
+            final_boosts[f'{collection}_final_boost'] = collection_weights[f'{db_collection}_weight'] * boost_factor
         
         # Combine all results into one dictionary
         result = {}

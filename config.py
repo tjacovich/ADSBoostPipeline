@@ -80,52 +80,52 @@ BOOST_WEIGHTS = {
 # None = no relevance (will get score of 0)
 
 COLLECTION_RANKINGS = {
-    'astronomy': {
-        'astronomy': 1,           # Highest relevance
-        'planetary_science': 4,
+    'astrophysics': {
+        'astrophysics': 1,           # Highest relevance
+        'planetary': 4,
         'physics': 2,
         'heliophysics': 4,
         'general': 3,
-        'earth_science': 6     # No relevance
+        'earthscience': 6     # No relevance
     },
     'physics': {
         'physics': 1,             # Highest relevance
-        'astronomy': 3,
-        'planetary_science': 3,
+        'astrophysics': 3,
+        'planetary': 3,
         'heliophysics': 3,
         'general': 2,
-        'earth_science': 3     # No relevance
+        'earthscience': 3     # No relevance
     },
-    'earth_science': {
-        'earth_science': 1,       # Highest relevance
-        'planetary_science': 4,
+    'earthscience': {
+        'earthscience': 1,       # Highest relevance
+        'planetary': 4,
         'general': 2,
-        'astronomy': 6,
+        'astrophysics': 6,
         'physics': 3,
         'heliophysics': 5      # No relevance
     },
-    'planetary_science': {
-        'planetary_science': 1,   # Highest relevance
-        'astronomy': 5,
-        'earth_science': 4,
+    'planetary': {
+        'planetary': 1,   # Highest relevance
+        'astrophysics': 5,
+        'earthscience': 4,
         'physics': 2,
         'heliophysics': 2,
         'general': 3
     },
     'heliophysics': {
         'heliophysics': 1,        # Highest relevance
-        'astronomy': 6,
+        'astrophysics': 6,
         'physics': 2,
-        'planetary_science': 3,
+        'planetary': 3,
         'general': 2,
-        'earth_science': 4     # No relevance
+        'earthscience': 4     # No relevance
     },
     'general': {
         'general': 1,             # Highest relevance
-        'astronomy': 1,
+        'astrophysics': 1,
         'physics': 1,
-        'planetary_science': 1,
-        'earth_science': 1,
+        'planetary': 1,
+        'earthscience': 1,
         'heliophysics': 1
     }
 }
@@ -134,4 +134,4 @@ COLLECTION_RANKINGS = {
 CITATION_DISTRIBUTION_UPDATE_FREQUENCY = 90  # Quarterly updates
 
 # Collections for citation boost calculations
-COLLECTIONS = ['astronomy', 'physics', 'earth_science', 'planetary_science', 'heliophysics', 'general']
+COLLECTIONS = ['astrophysics', 'physics', 'earthscience', 'planetary', 'heliophysics', 'general']
