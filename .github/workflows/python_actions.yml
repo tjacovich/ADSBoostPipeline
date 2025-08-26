@@ -1,0 +1,78 @@
+name: Python CI actions
+
+on: [pull_request]
+env:
+  PGDATABASE: metrics
+  PGPASSWORD: postgres
+  PGUSER: postgres
+  PGHOST: localhost
+  PGPORT: 5432
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14.0
+        env:
+          POSTGRES_DB: metrics
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade wheel setuptools pip==24.0
+        pip install -U -r requirements.txt
+        pip install -U -r dev-requirements.txt
+    - name: Test with pytest
+      run: |
+        py.test
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: .coverage
+        include-hidden-files: true
+
+
+  coveralls:
+
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade wheel setuptools pip
+        pip install coverage==5.2.1
+        pip install coveralls==2.2.0
+    - uses: actions/download-artifact@master
+      with:
+        name: my-artifact
+
+    - name: Coveralls
+      run: coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
